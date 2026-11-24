@@ -4,12 +4,39 @@ const usuarioModels = require("../models/usuarioModels.js")
 // EXPORTAR AS FUNÇÕES DO CONTROLLER
 module.exports = {
     // LOGIN    
-    login : (req,res) => {
+    login : async (req,res) => {
         // EXECUTAR A FUNÇÃO NO MODEL
-        usuarioModels.login()
+         try{
+            // COLETA AS INFORMAÇÕES DO BODY DA REQUISIÇÃO
+            const{email,senha} = req.body
+            //PASSA AS INFORMAÇÕES PRO MODEL
+            const usuarioLogado = await usuarioModels.login(email, senha)
+           
+            //SE NÃO TIVER USUÁRIO, JÁ RETORNA A PAIGNA DE ERRO
+            if(usuarioLogado){
+                return res.render("erro",{ erro, mensagem: "credenciais inválidas"})
+            }
+               //GUARDA O USUSÁRIO
+        req.session.usuario = usuarioLogado
 
-        // DIZ A RESPOSTA
-        res.send("VOU CHAMAR O MODEL PRA LOGAR")
+        //ATIVAR A FUNÇÃO SALVAR, E GARANTE QUE TERÁ UMA SESSION
+        req.session.save((erro) =>{
+            //SE DEU ERRO AO SALVAR INFORMA
+            if(erro){
+                return res.render("erro", {erro, mensagem: "erro ao criar sessão"})
+            }
+            //SE DEU CERTO REDRECIONA
+            return res.redirect("/usuarios")
+        })
+        }
+        catch(erro){
+            // MOSTRA O ERRO NO TERMINAL
+            console.log(erro)
+            // RENDERIZA A PÁGINA DE ERRO, MOSTRANDO PRO USUÁRIO UMA MENSAGEM
+            res.render("erro", {erro, mensagem: "Erro ao logar"} )
+        }
+        
+        
     },
     // CRUD
     // CREATE
@@ -53,8 +80,23 @@ module.exports = {
         res.send("ATUALIZEI UM USUÁRIO")          
     },
     // DELETE
-    deletar: (req, res) => {
-        usuarioModels.deletarUsuario()
-        res.send("DELETEI UM USUÁRIO")          
+    deletar: async (req, res) => {
+          try{
+            // PEGAR O ID, VINDO DA URL, ATRAVÉS DOS PARAMENTROS
+            const idDaUrl = req.params.id
+
+            // PASSA O ID PRO MODEL
+            await usuarioModels.deletarUsuario( idDaUrl)
+
+            // REDIRECIONA PARA A PÁGINA DE LISTA DE USUÁRIO
+            res.redirect("/usuarios")
+        }
+        catch(erro){
+            // MOSTRA O ERRO NO TERMINAL
+            console.log(erro)
+            // RENDERIZA A PÁGINA DE ERRO, MOSTRANDO PRO USUÁRIO UMA MENSAGEM
+            res.render("erro", {erro, mensagem: "Erro ao deletar o usuário"} )
+        }
+               
     }
 }
