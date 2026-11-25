@@ -13,6 +13,7 @@ const sql =' SELECT * FROM tb_ususarios WHERE enail = ? AND senha'
      // RETORNA PRO CONTROLLER O RESULTADO
      return resultado[0] || null
     },
+
     // CRUD
     // CREATE
     criarUsuario: async (nome, email, senha, perfil) =>{
@@ -25,6 +26,7 @@ const sql =' SELECT * FROM tb_ususarios WHERE enail = ? AND senha'
         // RETORNA PRO CONTROLLER O RESULTADO
         return resultado.insertId
     },
+
     // READ
       //VARIÁVEL PRA GUARDAR O COMANDO SQL
     listarUsuarios: async () => {
@@ -39,9 +41,17 @@ const sql =' SELECT * FROM tb_ususarios WHERE enail = ? AND senha'
     },
 
     // UPDATE
-    atualizarUsuario: () =>{
-        console.log("ATUALIZEI UM USUÁRIO");
+    atualizarUsuario: async (id,nome,email,senha, perfil) => {
+       //VARIÁVEL PRA GUARDAR O COMANDO SQL
+    const sql = 'UPDATE tb_usuarios SET nome = ?, email = ?, senha = ?, perfil = ? WHERE id_usuario = ?'
+     // EXECUTA O SQL
+    const [resultado]= await db.execute(sql,[nome, email, senha, perfil, id])
+    
+    //RETORNAR PRO CONTROLLER O RESULTADP
+     return resultado.affectedRows
+
     },
+
     // DELETE
     deletarUsuario: async (Id) => {
      //VARIÁVEL PRA GUARDAR O COMANDO SQL

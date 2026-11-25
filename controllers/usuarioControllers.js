@@ -75,10 +75,26 @@ module.exports = {
         
     },
     // UPDATE
-    atualizar: (req, res) =>{
-        usuarioModels.atualizarUsuario()
-        res.send("ATUALIZEI UM USUÁRIO")          
-    },
+    editar: async (req, res) => {
+          try{
+            // PEGAR O ID, VINDO DA URL, ATRAVÉS DOS PARAMENTROS
+            const idDaUrl = req.params.id
+
+            // COLETA AS INFORMAÇÕES DO BODY DA REQUISIÇÃO
+          const{nome, email, senha, perfil} = req.body
+
+            // PASSA AS INFORMAÇÕES PRO MODEL
+            await usuarioModels.atualizarUsuario(idDaUrl, nome, email, senha, perfil)
+            //REDIRECIONAPARA A PÁGINADE LISTA DE USUÁRIO
+            res,redirect("/usuarios")
+        }
+        catch(erro){
+            // MOSTRA O ERRO NO TERMINAL
+            console.log(erro)
+            // RENDERIZA A PÁGINA DE ERRO, MOSTRANDO PRO USUÁRIO UMA MENSAGEM
+            res.render("erro", {erro, mensagem: "Erro ao editar o usuário"} )          
+    }
+},
     // DELETE
     deletar: async (req, res) => {
           try{
@@ -98,5 +114,5 @@ module.exports = {
             res.render("erro", {erro, mensagem: "Erro ao deletar o usuário"} )
         }
                
-    }
+    },
 }
